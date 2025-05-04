@@ -67,26 +67,28 @@ void read_array(const std::string &filename, std::vector<int> &array, int expect
     }
 }
 
-void find_files(const std::string &folder, std::string &S_file, std::string &T_file,
+void find_files(const std::string &folder_path, std::string &S_file, std::string &T_file,
                 int &S_rows, int &S_cols, int &T_rows, int &T_cols)
 {
-    for (const auto &entry : fs::directory_iterator(folder))
+    std::string folder_name = fs::path(folder_path).filename().string();
+    for (const auto &entry : fs::directory_iterator(folder_path))
     {
         std::string filename = entry.path().filename().string();
-        if (filename.find("S" + folder + "_") == 0)
+        if (filename.find("S" + folder_name + "_") == 0)
         {
             S_file = entry.path().string();
             parse_filename(filename, S_rows, S_cols);
         }
-        else if (filename.find("T" + folder + "_") == 0)
+        else if (filename.find("T" + folder_name + "_") == 0)
         {
             T_file = entry.path().string();
             parse_filename(filename, T_rows, T_cols);
         }
     }
+
     if (S_file.empty() || T_file.empty())
     {
-        throw std::runtime_error("Could not find S or T file in folder: " + folder);
+        throw std::runtime_error("Could not find S or T file in folder: " + folder_path);
     }
 }
 
