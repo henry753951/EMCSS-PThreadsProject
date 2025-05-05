@@ -104,6 +104,6 @@ void print_positions(const std::vector<std::pair<int, int>> &positions)
 {
     for (const auto &pos : positions)
     {
-        std::cout << "(" << pos.first + 1 << "," << pos.second + 1 << ")" << std::endl;
+        std::cout << "(" << pos.first << "," << pos.second << ")" << std::endl;
     }
 }

@@ -76,6 +76,8 @@ void *compute_thread_func(void *arg)
                 }
             }
             double value = data->compute_func(sub_T, *data->S);
+
+            // Lock the mutex to update the local best value and positions
             if (data->find_max)
             {
                 if (value > data->local_best_value + epsilon)
