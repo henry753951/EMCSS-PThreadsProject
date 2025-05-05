@@ -26,7 +26,6 @@ struct ComputeThreadData
     int start_i, end_i;
     double local_best_value;
     std::vector<std::pair<int, int>> local_best_positions;
-    std::mutex *mtx;
 };
 
 void compute_parallel(const std::vector<int> &S, const std::vector<int> &T,
