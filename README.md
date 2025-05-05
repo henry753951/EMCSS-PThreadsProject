@@ -2,7 +2,7 @@
 
 ## Results
 
-Output files are located in the `outputs` directory. The table below summarizes the computation times and speedups for each dataset:
+Output files are located in the `outputs` directory.
 
 | Dataset | PCC (No Parallel) | PCC (Parallel) | PCC Speedup | SSD (No Parallel) | SSD (Parallel) | SSD Speedup |
 |---------|-------------------|----------------|--------------|-------------------|----------------|--------------|
