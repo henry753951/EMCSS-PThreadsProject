@@ -10,3 +10,6 @@ Output files are located in the `outputs` directory.
 | Data 2  | 0.599912 s         | 0.044695 s      | ≈ 13.42×     | 0.375431 s         | 0.035430 s      | ≈ 10.59×     |
 | Data 3  | 2.390987 s         | 0.153346 s      | ≈ 15.59×     | 1.910450 s         | 0.120845 s      | ≈ 15.81×     |
 | Data 4  | 0.000116 s         | 0.003013 s      | ≈ 0.04×      | 0.000070 s         | 0.002931 s      | ≈ 0.02×      |
+
+![image](https://github.com/user-attachments/assets/7ddff30d-5d0e-41b6-9159-58835d4e286c)
+
