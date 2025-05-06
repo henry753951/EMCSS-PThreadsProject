@@ -130,6 +130,20 @@ void display_results(const std::string &method, const std::vector<std::pair<int,
     std::cout << "----------------------------------------\n";
 }
 
+void reset_csv(const std::string &data_path)
+{
+    std::string csv_path = "outputs/";
+    std::string filename = data_path;
+    std::replace(filename.begin(), filename.end(), '/', '_');
+    filename += ".csv";
+    csv_path += filename;
+
+    if (fs::exists(csv_path))
+    {
+        fs::remove(csv_path);
+    }
+}
+
 void write_to_csv(const std::string &data_path, int s_rows, int s_cols, int t_rows, int t_cols,
                   const std::string &method, int threads_count, const std::vector<std::pair<int, int>> &best_positions,
                   double best_value, double time)
@@ -140,7 +154,6 @@ void write_to_csv(const std::string &data_path, int s_rows, int s_cols, int t_ro
     filename += "_" + std::to_string(s_rows) + "x" + std::to_string(s_cols) + "_" +
                 std::to_string(t_rows) + "x" + std::to_string(t_cols) + ".csv";
     csv_path += filename;
-
     if (!fs::exists("outputs"))
     {
         if (!fs::create_directory("outputs"))

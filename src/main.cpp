@@ -50,6 +50,8 @@ double run_method(const Method &method, const std::vector<int> &S, const std::ve
     std::cout << "\n[Computing " << method.name << " with " << threads_count
               << " thread" << (threads_count > 1 ? "s" : "") << "]\n";
 
+    reset_csv(data_path);
+
     auto start = std::chrono::high_resolution_clock::now();
 
     std::vector<std::pair<int, int>> best_positions;
