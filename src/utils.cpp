@@ -161,7 +161,6 @@ void write_to_csv(const std::string &data_path, int s_rows, int s_cols, int t_ro
     }
 
     std::string positions_str = get_positions_str(best_positions);
-    // Quote positions string to handle spaces and commas
     positions_str = "\"" + positions_str + "\"";
 
     csv_file << std::fixed << std::setprecision(2);
