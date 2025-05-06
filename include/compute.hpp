@@ -31,6 +31,6 @@ struct ComputeThreadData
 void compute_parallel(const std::vector<int> &S, const std::vector<int> &T,
                       int S_rows, int S_cols, int T_rows, int T_cols,
                       std::function<double(const std::vector<int> &, const std::vector<int> &)> compute_func,
-                      bool find_max, std::vector<std::pair<int, int>> &best_positions, double &best_value);
+                      bool find_max, std::vector<std::pair<int, int>> &best_positions, double &best_value, int threads_count);
 
 #endif

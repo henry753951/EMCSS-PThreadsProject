@@ -18,7 +18,9 @@
             "extensions": [
                 "ms-vscode.cpptools",
                 "ms-vscode.cpptools-extension-pack",
-                "actboy168.tasks"
+                "actboy168.tasks",
+                "ms-python.python",
+                "charliermarsh.ruff"
             ],
             "settings": {
                 "git.useIntegratedAskPass": true

@@ -100,10 +100,76 @@ void read_arrays(const std::string &S_file, const std::string &T_file,
     read_array(T_file, T, T_rows, T_cols);
 }
 
-void print_positions(const std::vector<std::pair<int, int>> &positions)
+std::string get_positions_str(const std::vector<std::pair<int, int>> &positions)
 {
+    std::string ss;
     for (const auto &pos : positions)
     {
-        std::cout << "(" << pos.first << "," << pos.second << ")" << std::endl;
+        ss += "(" + std::to_string(pos.first) + "," + std::to_string(pos.second) + ") ";
     }
+    return ss;
+}
+
+void display_results(const std::string &method, const std::vector<std::pair<int, int>> &best_positions,
+                     double best_value, double time)
+{
+    std::cout << "----------------------------------------\n";
+    std::cout << "Results for " << method << ":\n";
+    std::cout << "Best value: " << std::fixed << std::setprecision(2) << best_value << "\n";
+    std::cout << "Best positions:\n";
+    if (best_positions.empty())
+    {
+        std::cout << "No positions found.\n";
+    }
+    else
+    {
+        std::cout << get_positions_str(best_positions) << "\n";
+    }
+    std::cout << "Computation time: " << std::fixed << std::setprecision(6)
+              << time << " seconds\n";
+    std::cout << "----------------------------------------\n";
+}
+
+void write_to_csv(const std::string &data_path, int s_rows, int s_cols, int t_rows, int t_cols,
+                  const std::string &method, int threads_count, const std::vector<std::pair<int, int>> &best_positions,
+                  double best_value, double time)
+{
+    std::string csv_path = "outputs/";
+    std::string filename = data_path;
+    std::replace(filename.begin(), filename.end(), '/', '_');
+    filename += "_" + std::to_string(s_rows) + "x" + std::to_string(s_cols) + "_" +
+                std::to_string(t_rows) + "x" + std::to_string(t_cols) + ".csv";
+    csv_path += filename;
+
+    if (!fs::exists("outputs"))
+    {
+        if (!fs::create_directory("outputs"))
+        {
+            throw std::runtime_error("Failed to create outputs directory");
+        }
+    }
+
+    std::ofstream csv_file(csv_path, std::ios::app);
+    if (!csv_file.is_open())
+    {
+        throw std::runtime_error("Failed to open CSV file: " + csv_path);
+    }
+
+    if (csv_file.tellp() == 0)
+    {
+        csv_file << "methods,threads,best_positions,best_value,cost_time\n";
+    }
+
+    std::string positions_str = get_positions_str(best_positions);
+    // Quote positions string to handle spaces and commas
+    positions_str = "\"" + positions_str + "\"";
+
+    csv_file << std::fixed << std::setprecision(2);
+    csv_file << method << ","
+             << threads_count << ","
+             << positions_str << ","
+             << best_value << ","
+             << std::setprecision(6) << time << "\n";
+
+    csv_file.close();
 }

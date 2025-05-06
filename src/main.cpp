@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
+#include <algorithm>
 
 #include "compute.hpp"
 #include "pcc.hpp"
@@ -13,15 +15,14 @@
 struct Method
 {
     std::string name;
-    std::function<double(const std::vector<int> &, const std::vector<int> &)>
-        compute_func;
+    std::function<double(const std::vector<int> &, const std::vector<int> &)> compute_func;
     bool find_max;
 };
 
 std::string get_folder_path()
 {
     std::string folder;
-    std::cout << "Path: ";
+    std::cout << "Enter folder path: ";
     std::cin >> folder;
     if (!folder.empty() && folder[0] == '/')
     {
@@ -30,71 +31,84 @@ std::string get_folder_path()
     return folder;
 }
 
-bool use_parallel_computation()
+void display_system_info(int num_cores, int max_threads, int s_rows, int s_cols, int t_rows, int t_cols)
 {
-    std::cout << "Use parallel? (y/n): ";
-    char choice;
-    std::cin >> choice;
-    return (choice == 'y' || choice == 'Y');
+    std::cout << "\nSystem Information:\n";
+    std::cout << "-------------------\n";
+    std::cout << "Available cores: " << num_cores << "\n";
+    std::cout << "\nComputation Parameters:\n";
+    std::cout << "-------------------\n";
+    std::cout << "Maximum threads: " << max_threads << "\n";
+    std::cout << "Matrix S dimensions: " << s_rows << "x" << s_cols << "\n";
+    std::cout << "Matrix T dimensions: " << t_rows << "x" << t_cols << "\n\n";
 }
 
-double run_method(const Method &method, const std::vector<int> &S,
-                  const std::vector<int> &T, int S_rows, int S_cols, int T_rows,
-                  int T_cols, bool use_parallel)
+double run_method(const Method &method, const std::vector<int> &S, const std::vector<int> &T,
+                  int s_rows, int s_cols, int t_rows, int t_cols, int threads_count,
+                  const std::string &data_path)
 {
-    std::cout << "\n[Computing " << method.name << "...]\n";
+    std::cout << "\n[Computing " << method.name << " with " << threads_count
+              << " thread" << (threads_count > 1 ? "s" : "") << "]\n";
 
     auto start = std::chrono::high_resolution_clock::now();
 
     std::vector<std::pair<int, int>> best_positions;
     double best_value;
-    if (use_parallel)
+    if (threads_count > 1)
     {
-        compute_parallel(S, T, S_rows, S_cols, T_rows, T_cols, method.compute_func,
-                         method.find_max, best_positions, best_value);
+        compute_parallel(S, T, s_rows, s_cols, t_rows, t_cols, method.compute_func,
+                         method.find_max, best_positions, best_value, threads_count);
     }
     else
     {
-        compute(S, T, S_rows, S_cols, T_rows, T_cols, method.compute_func,
+        compute(S, T, s_rows, s_cols, t_rows, t_cols, method.compute_func,
                 method.find_max, best_positions, best_value);
     }
 
     auto end = std::chrono::high_resolution_clock::now();
-    double time =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() /
-        1e6;
+    double time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1e6;
 
-    std::cout << "Best " << method.name << " positions (value: " << std::fixed
-              << std::setprecision(2) << best_value << "):\n";
-    print_positions(best_positions);
-    std::cout << method.name << " computation time: " << std::fixed
-              << std::setprecision(6) << time << " seconds\n";
+    display_results(method.name, best_positions, best_value, time);
+    write_to_csv(data_path, s_rows, s_cols, t_rows, t_cols, method.name, threads_count,
+                 best_positions, best_value, time);
 
     return time;
 }
 
 int main()
 {
+    std::cout << std::fixed << std::setprecision(6);
     std::string folder = get_folder_path();
-    bool use_parallel = use_parallel_computation();
+    int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
 
     try
     {
-        std::string S_file, T_file;
-        int S_rows, S_cols, T_rows, T_cols;
-        find_files(folder, S_file, T_file, S_rows, S_cols, T_rows, T_cols);
+        std::string s_file, t_file;
+        int s_rows, s_cols, t_rows, t_cols;
+        find_files(folder, s_file, t_file, s_rows, s_cols, t_rows, t_cols);
 
         std::vector<int> S, T;
-        read_arrays(S_file, T_file, S_rows, S_cols, T_rows, T_cols, S, T);
+        read_arrays(s_file, t_file, s_rows, s_cols, t_rows, t_cols, S, T);
 
         std::vector<Method> methods = {
             {"PCC", compute_pcc, true},
-            {"SSD", compute_ssd, false},
-        };
+            {"SSD", compute_ssd, false}};
 
-        for (const auto &method : methods)
+        int max_i = t_rows - s_rows + 1;
+        int max_threads = std::min(num_cores, max_i);
+
+        display_system_info(num_cores, max_threads, s_rows, s_cols, t_rows, t_cols);
+
+        for (int threads_count = 1; threads_count <= max_threads; ++threads_count)
         {
-            run_method(method, S, T, S_rows, S_cols, T_rows, T_cols, use_parallel);
+            std::cout << "=== Starting computations with " << threads_count
+                      << " thread" << (threads_count > 1 ? "s" : "") << " ===\n";
+
+            for (const auto &method : methods)
+            {
+                run_method(method, S, T, s_rows, s_cols, t_rows, t_cols, threads_count, folder);
+            }
+            std::cout << "\n";
         }
     }
     catch (const std::exception &e)

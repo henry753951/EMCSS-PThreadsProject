@@ -129,7 +129,7 @@ void *compute_thread_func(void *arg)
 void compute_parallel(const std::vector<int> &S, const std::vector<int> &T,
                       int S_rows, int S_cols, int T_rows, int T_cols,
                       std::function<double(const std::vector<int> &, const std::vector<int> &)> compute_func,
-                      bool find_max, std::vector<std::pair<int, int>> &best_positions, double &best_value)
+                      bool find_max, std::vector<std::pair<int, int>> &best_positions, double &best_value, int threads_count)
 {
     if (S_rows <= 0 || S_cols <= 0 || T_rows <= 0 || T_cols <= 0 ||
         S_rows > T_rows || S_cols > T_cols ||
@@ -143,13 +143,10 @@ void compute_parallel(const std::vector<int> &S, const std::vector<int> &T,
     best_value = find_max ? -std::numeric_limits<double>::max() : std::numeric_limits<double>::max();
     best_positions.clear();
 
-    long num_cores = sysconf(_SC_NPROCESSORS_ONLN);
-    if (num_cores <= 0)
-        num_cores = 1;
-
     int max_i = T_rows - S_rows + 1;
-    // Thread count = min(num_cores, max_i)
-    size_t num_threads = std::min(static_cast<size_t>(num_cores), static_cast<size_t>(max_i));
+    int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
+    size_t num_threads = std::min(static_cast<size_t>(threads_count), static_cast<size_t>(max_i));
+    num_threads = std::min(num_threads, static_cast<size_t>(num_cores));
     num_threads = std::max(size_t(1), num_threads);
 
     std::vector<pthread_t> threads(num_threads);

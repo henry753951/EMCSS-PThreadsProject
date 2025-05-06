@@ -18,6 +18,10 @@ void find_files(const std::string &folder, std::string &S_file, std::string &T_f
 void read_arrays(const std::string &S_file, const std::string &T_file,
                  int S_rows, int S_cols, int T_rows, int T_cols,
                  std::vector<int> &S, std::vector<int> &T);
-void print_positions(const std::vector<std::pair<int, int>> &positions);
+std::string get_positions_str(const std::vector<std::pair<int, int>> &positions);
+void display_results(const std::string &method, const std::vector<std::pair<int, int>> &best_positions,
+                     double best_value, double time);
+void write_to_csv(const std::string &filename, int S_rows, int S_cols, int T_rows, int T_cols,
+                  const std::string &method, int threads_count, const std::vector<std::pair<int, int>> &best_positions, double best_value, double time);
 
 #endif
