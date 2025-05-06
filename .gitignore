@@ -6,4 +6,5 @@
 *.fatbin
 main
 data/**
+!data/test_data.zip
 build/

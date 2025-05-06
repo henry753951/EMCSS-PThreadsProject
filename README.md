@@ -4,6 +4,7 @@
 
 Output files are located in the `outputs` directory.
 
+
 | Dataset | PCC (No Parallel) | PCC (Parallel) | PCC Speedup | SSD (No Parallel) | SSD (Parallel) | SSD Speedup |
 |---------|-------------------|----------------|--------------|-------------------|----------------|--------------|
 | Data 1  | 0.470315 s         | 0.043346 s      | ≈ 10.85×     | 0.368620 s         | 0.032088 s      | ≈ 11.49×     |
